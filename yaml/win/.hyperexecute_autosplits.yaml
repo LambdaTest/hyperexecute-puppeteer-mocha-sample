@@ -1,0 +1,19 @@
+version: 0.1
+runson: win
+globalTimeout: 90
+testSuiteTimeout: 90
+testSuiteStep: 90
+autosplit: true
+retryOnFailure: true
+maxRetries: 2
+concurrency: 2
+pre:
+  - npm install
+cacheKey: '{{ checksum "package.json" }}'
+cacheDirectories:
+  - node_modules
+testDiscovery:
+  type: raw
+  mode: dynamic
+  command: grep -lr 'describe' specs/*.spec.js
+testRunnerCommand: npm test $test
