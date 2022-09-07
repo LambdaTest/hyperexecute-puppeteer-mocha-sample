@@ -31,12 +31,9 @@ describe('Search Text', () => {
 	it('should be titled "Lambdatest"', async () => {
 		let text = 'LambdaTest';
 		await page.goto('https://www.duckduckgo.com');
-		await page.waitForTimeout(20000);
 		var element = await page.$('[name="q"]');
 		await element.click();
-		await page.waitForTimeout(20000);
 		await element.type(text);
-		await page.waitForTimeout(20000);
 		await Promise.all([
 			page.keyboard.press('Enter'),
 			page.waitForNavigation()
