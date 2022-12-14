@@ -5,7 +5,7 @@ testSuiteTimeout: 90
 testSuiteStep: 90
 autosplit: true
 retryOnFailure: true
-maxRetries: 2
+maxRetries: 1
 concurrency: 2
 pre:
   - npm install
