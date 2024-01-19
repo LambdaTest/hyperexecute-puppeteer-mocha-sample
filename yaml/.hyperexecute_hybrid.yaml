@@ -1,0 +1,48 @@
+version: 0.1
+globalTimeout: 150
+testSuiteTimeout: 150
+testSuiteStep: 150
+
+runson: ${matrix.os}
+retryOnFailure: false
+
+autosplit: true
+
+maxRetries: 1
+parallelism: 2
+concurrency: 3
+
+matrix:
+  os: [mac, win, linux]
+
+env:
+  CACHE_DIR: m2_cache_dir
+
+cacheKey: '{{ checksum "pom.xml" }}'
+cacheDirectories:
+  - ${CACHE_DIR}
+
+testDiscovery:
+  type: raw
+  mode: dynamic
+  command: grep -lr 'describe' specs/*.spec.js
+
+pre:
+  - mvn -Dmaven.repo.local=${CACHE_DIR} -Dmaven.test.skip=true clean install
+
+post:
+  - cat yaml/.hyperexecute_hybrid.yaml
+
+mergeArtifacts: true
+uploadArtifacts: 
+    - name: Surefire Report
+      path:
+        - target/surefire-reports/**
+
+report: true
+partialReports:
+  frameworkName: extent
+  location: target/surefire-reports/html
+  type: json
+
+testRunnerCommand: npm test $test

@@ -1,17 +1,36 @@
 version: 0.1
+
 runson: win
+
 globalTimeout: 90
 testSuiteTimeout: 90
 testSuiteStep: 90
+
 autosplit: true
+
 retryOnFailure: true
 maxRetries: 1
 concurrency: 2
+
 pre:
   - npm install
+
 cacheKey: '{{ checksum "package.json" }}'
 cacheDirectories:
   - node_modules
+
+mergeArtifacts: true
+uploadArtifacts: 
+    - name: Surefire Report
+      path:
+        - target/surefire-reports/**
+
+report: true
+partialReports:
+  frameworkName: extent
+  location: target/surefire-reports/html
+  type: json
+
 testDiscovery:
   type: raw
   mode: dynamic
