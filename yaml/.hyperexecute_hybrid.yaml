@@ -33,16 +33,6 @@ pre:
 post:
   - cat yaml/.hyperexecute_hybrid.yaml
 
-mergeArtifacts: true
-uploadArtifacts: 
-    - name: Surefire Report
-      path:
-        - target/surefire-reports/**
-
-report: true
-partialReports:
-  frameworkName: extent
-  location: target/surefire-reports/html
-  type: json
-
 testRunnerCommand: npm test $test
+
+jobLabel: [puppeteer-Mocha, hybrid]
