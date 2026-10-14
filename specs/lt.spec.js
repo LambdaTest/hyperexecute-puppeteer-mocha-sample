@@ -2,7 +2,12 @@ const puppeteer = require('puppeteer');
 const expect = require('chai').expect;
 const caps = {
 	browserName    : 'Chrome',
-	browserVersion : 'latest',
+	// Pinned to Chrome 135 on purpose. CDP itself still works on newer Chrome, but from
+	// Chrome 136 --remote-debugging-port is ignored when Chrome runs on its default profile
+	// (https://developer.chrome.com/blog/remote-debugging-port). The HyperExecute VM starts
+	// Chrome that way, so with 'latest' the CDP connection never opens. Switch back to
+	// 'latest' once the VM launches Chrome with its own --user-data-dir.
+	browserVersion : '135',
 	'LT:Options'   : {
 		platform   : process.env.HYPEREXECUTE_PLATFORM,
 		build      : 'Sample Puppeteer-Mocha',
@@ -23,14 +28,18 @@ describe('Search Text', () => {
 			browserWSEndpoint : `wss://cdp.lambdatest.com/puppeteer?capabilities=${encodeURIComponent(
 				JSON.stringify(caps)
 			)}`,
-			ignoreHTTPSErrors: true
+			ignoreHTTPSErrors: true,
+			// Chrome's privacy sandbox dialog shows up as a page that never attaches
+			targetFilter: (target) => !String(typeof target.url === 'function' ? target.url() : target.url).startsWith('chrome://privacy-sandbox-dialog')
 		});
 		page = await browser.newPage();
+		// on the Windows VM the tab opens in the background and typed text is dropped
+		await page.bringToFront();
 	});
 
 	it('should be titled "Lambdatest"', async () => {
 		let text = 'LambdaTest';
-		await page.goto('https://www.duckduckgo.com');
+		await page.goto('https://www.duckduckgo.com', { waitUntil: 'networkidle2' });
 		var element = await page.$('[name="q"]');
 		await element.click();
 		await element.type(text);
@@ -60,7 +69,9 @@ describe('Search Text', () => {
 	});
 
 	afterEach(async () => {
-		await page.close();
-		await browser.close();
+		if (page) await page.close();
+		if (browser) await browser.close();
+		page = null;
+		browser = null;
 	});
 });
