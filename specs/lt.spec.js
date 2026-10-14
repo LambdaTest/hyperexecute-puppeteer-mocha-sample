@@ -2,8 +2,11 @@ const puppeteer = require('puppeteer');
 const expect = require('chai').expect;
 const caps = {
 	browserName    : 'Chrome',
-	// Chrome 136+ ignores --remote-debugging-port on the default profile, which the
-	// HyperExecute VM relies on, so the CDP connection never opens with 'latest'
+	// Pinned to Chrome 135 on purpose. CDP itself still works on newer Chrome, but from
+	// Chrome 136 --remote-debugging-port is ignored when Chrome runs on its default profile
+	// (https://developer.chrome.com/blog/remote-debugging-port). The HyperExecute VM starts
+	// Chrome that way, so with 'latest' the CDP connection never opens. Switch back to
+	// 'latest' once the VM launches Chrome with its own --user-data-dir.
 	browserVersion : '135',
 	'LT:Options'   : {
 		platform   : process.env.HYPEREXECUTE_PLATFORM,
